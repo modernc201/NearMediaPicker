@@ -232,6 +232,10 @@ public class MediaPickerFragment extends BaseFragment implements
         if (mMediaSelectedList != null) {
             mMediaAdapter.setMediaSelectedList(mMediaSelectedList);
         }
+        mMediaAdapter.setCountTextColor(countTextColorResID);
+        mMediaAdapter.setSelectorBorderColor(borderColorResID);
+        mMediaAdapter.setCountBackgroundResID(countBackgroundResID);
+        mMediaAdapter.setMAX(MAX);
         mMediaAdapter.notifyDataSetChanged();
     }
 

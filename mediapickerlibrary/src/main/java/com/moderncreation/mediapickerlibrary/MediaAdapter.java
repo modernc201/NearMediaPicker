@@ -290,6 +290,10 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
         this.borderColorResID = borderColorResID;
     }
 
+    public void setCountBackgroundResID(int countBackgroundResID){
+        this.countBackgroundResID = countBackgroundResID;
+    }
+
 
     public void setCountTextColor(int countTextColorResID){
         this.countTextColorResID = countTextColorResID;

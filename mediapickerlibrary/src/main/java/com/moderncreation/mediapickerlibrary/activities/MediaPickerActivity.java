@@ -66,6 +66,7 @@ public class MediaPickerActivity extends AppCompatActivity implements
 
     private static final String KEY_PHOTOFILE_CAPTURE = "key_photofile_capture";
     private static final int REQUEST_CAMERA_PERMISSION = 300;
+    private static Activity parentActivity;
 
     private MediaOptions mMediaOptions;
     private MenuItem mMediaSwitcher;
@@ -104,6 +105,7 @@ public class MediaPickerActivity extends AppCompatActivity implements
         intent.putExtra(KEY_MEDIA_SELECTED_MAX, max);
 
         activity.startActivityForResult(intent, requestCode);
+        parentActivity = activity;
 
     }
 
@@ -706,5 +708,9 @@ public class MediaPickerActivity extends AppCompatActivity implements
                 fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
+    }
+
+    public static Activity getParentActivity(){
+        return parentActivity;
     }
 }

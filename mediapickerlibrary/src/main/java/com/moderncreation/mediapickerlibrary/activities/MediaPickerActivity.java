@@ -42,36 +42,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Use this activity for pickup photos or videos (media).
- * <p/>
- * How to use:
- * <ul>
- * <li>
- * Step1: Open media picker: <br/>
- * - If using in activity use:
- * {@link MediaPickerActivity#open(Activity, int, MediaOptions)} or
- * {@link MediaPickerActivity#open(Activity, int)}</li>
- * - If using in fragment use:
- * {@link MediaPickerActivity#open(Fragment, int, MediaOptions)} or
- * {@link MediaPickerActivity#open(Fragment, int)} <br/>
- * </li>
- * <li>
- * Step2: Get out media that selected in
- * {@link Activity#onActivityResult(int, int, Intent)} of activity or fragment
- * that open media picker. Use
- * {@link MediaPickerActivity#getMediaItemSelected(Intent)} to get out media
- * list that selected.</li>
- * <p/>
- * <i>Note: Videos or photos return back depends on {@link MediaOptions} passed
- * to {@link #open(Activity, int, MediaOptions)} </i></li>
- * </ul>
- */
+
 public class MediaPickerActivity extends AppCompatActivity implements
         MediaSelectedListener, CropListener, FragmentManager.OnBackStackChangedListener, FragmentHost {
     private static final String TAG = "MediaPickerActivity";
 
     public static final String EXTRA_MEDIA_OPTIONS = "extra_media_options";
+
+    public static final String KEY_COUNT_TEXT_COLOR = "KEY_COUNT_TEXT_COLOR";
+    public static final String KEY_COUNT_BACKGROUND_COLOR = "KEY_COUNT_BACKGROUND_COLOR";
+    public static final String KEY_SELECTED_BORDER_COLOR = "KEY_SELECTED_BORDER_COLOR";
+    public static final String KEY_MEDIA_SELECTED_MAX = "KEY_MEDIA_SELECTED_MAX";
     /**
      * Intent extra included when return back data in
      * {@link Activity#onActivityResult(int, int, Intent)} of activity or fragment
@@ -99,6 +80,11 @@ public class MediaPickerActivity extends AppCompatActivity implements
     private boolean takePhotoPending;
     private boolean takeVideoPending;
 
+    private int MAX = 5;
+    private int countBackgroundResID = -1;
+    private int countTextColorResID = -1;
+    private int borderColorResID = -1;
+
     /**
      * Start {@link MediaPickerActivity} in {@link Activity} to pick photo or
      * video that depends on {@link MediaOptions} passed.
@@ -108,10 +94,17 @@ public class MediaPickerActivity extends AppCompatActivity implements
      * @param options
      */
     public static void open(Activity activity, int requestCode,
-                            MediaOptions options) {
+                            MediaOptions options, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
         Intent intent = new Intent(activity, MediaPickerActivity.class);
         intent.putExtra(EXTRA_MEDIA_OPTIONS, options);
-        activity.startActivityForResult(intent, requestCode);
+
+        intent.putExtra(KEY_SELECTED_BORDER_COLOR, borderColorResID);
+        intent.putExtra(KEY_COUNT_BACKGROUND_COLOR, countBackgroundResID);
+        intent.putExtra(KEY_COUNT_TEXT_COLOR, countTextColorResID);
+        intent.putExtra(KEY_MEDIA_SELECTED_MAX, max);
+
+        activity.startActivityForResult(intent, requestCode);;
+
     }
 
     /**
@@ -121,8 +114,8 @@ public class MediaPickerActivity extends AppCompatActivity implements
      * @param activity
      * @param requestCode
      */
-    public static void open(Activity activity, int requestCode) {
-        open(activity, requestCode, MediaOptions.createDefault());
+    public static void open(Activity activity, int requestCode, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
+        open(activity, requestCode, MediaOptions.createDefault(), borderColorResID, countBackgroundResID, countTextColorResID,max);
     }
 
     /**
@@ -176,7 +169,7 @@ public class MediaPickerActivity extends AppCompatActivity implements
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container,
-                            MediaPickerFragment.newInstance(mMediaOptions))
+                            MediaPickerFragment.newInstance(mMediaOptions, borderColorResID, countBackgroundResID, countTextColorResID, MAX))
                     .commit();
         }
         getSupportFragmentManager().addOnBackStackChangedListener(this);

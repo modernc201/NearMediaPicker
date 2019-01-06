@@ -21,4 +21,21 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_video_grid" />
 
+    <Button
+        android:id="@+id/count"
+        android:layout_width="@dimen/picker_selected_count_size"
+        android:layout_height="@dimen/picker_selected_count_size"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:textAlignment="gravity"
+        android:layout_margin="@dimen/picker_selected_count_margin"
+        android:padding="0dp"
+        android:background="@drawable/picker_count_backgourd"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        />
+
+
+
 </RelativeLayout>

@@ -22,6 +22,7 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.moderncreation.mediapickerlibrary.MediaAdapter;
@@ -37,6 +38,11 @@ import com.moderncreation.mediapickerlibrary.widget.PickerImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.moderncreation.mediapickerlibrary.activities.MediaPickerActivity.KEY_COUNT_BACKGROUND_COLOR;
+import static com.moderncreation.mediapickerlibrary.activities.MediaPickerActivity.KEY_COUNT_TEXT_COLOR;
+import static com.moderncreation.mediapickerlibrary.activities.MediaPickerActivity.KEY_MEDIA_SELECTED_MAX;
+import static com.moderncreation.mediapickerlibrary.activities.MediaPickerActivity.KEY_SELECTED_BORDER_COLOR;
+
 /**
  * Display list of videos, photos from {@link MediaStore} and select one or many
  * item from list depends on {@link MediaOptions} that passed when open media
@@ -49,6 +55,12 @@ public class MediaPickerFragment extends BaseFragment implements
     private static final String KEY_MEDIA_TYPE = "media_type";
     private static final String KEY_GRID_STATE = "grid_state";
     private static final String KEY_MEDIA_SELECTED_LIST = "media_selected_list";
+
+//    private static final String KEY_COUNT_TEXT_COLOR_A = "media_selected_list";
+//    private static final String KEY_COUNT_TEXT_COLOR_A = "media_selected_list";
+//    private static final String KEY_COUNT_TEXT_COLOR_A = "media_selected_list";
+//    private static final String KEY_COUNT_TEXT_COLOR_A = "media_selected_list";
+
     private static final int REQUEST_READ_EXTERNAL_STORAGE = 100;
 
     private HeaderGridView mGridView;
@@ -62,13 +74,24 @@ public class MediaPickerFragment extends BaseFragment implements
     private int mMediaType;
     private int mPhotoSize, mPhotoSpacing;
 
+    private int a = 255,r= 118,g =193,b=200;
+    private int MAX = 5;
+    private int countBackgroundResID = -1;
+    private int countTextColorResID = -1;
+    private int borderColorResID = -1;
+
     public MediaPickerFragment() {
         mSavedInstanceState = new Bundle();
     }
 
-    public static MediaPickerFragment newInstance(MediaOptions options) {
+    public static MediaPickerFragment newInstance(MediaOptions options, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(MediaPickerActivity.EXTRA_MEDIA_OPTIONS, options);
+        bundle.putInt(KEY_COUNT_TEXT_COLOR, countTextColorResID);
+        bundle.putInt(KEY_COUNT_BACKGROUND_COLOR, countBackgroundResID);
+        bundle.putInt(KEY_SELECTED_BORDER_COLOR, borderColorResID);
+        bundle.putInt(KEY_MEDIA_SELECTED_MAX, max);
+
         MediaPickerFragment fragment = new MediaPickerFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -90,6 +113,16 @@ public class MediaPickerFragment extends BaseFragment implements
             mMediaSelectedList = savedInstanceState
                     .getParcelableArrayList(KEY_MEDIA_SELECTED_LIST);
             mSavedInstanceState = savedInstanceState;
+
+
+            MAX = savedInstanceState
+                    .getInt(KEY_MEDIA_SELECTED_MAX);
+            countBackgroundResID = savedInstanceState
+                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColorResID = savedInstanceState
+                    .getInt(KEY_COUNT_TEXT_COLOR);
+            borderColorResID = savedInstanceState
+                    .getInt(KEY_SELECTED_BORDER_COLOR);
         } else {
             mMediaOptions = getArguments().getParcelable(
                     MediaPickerActivity.EXTRA_MEDIA_OPTIONS);
@@ -104,12 +137,23 @@ public class MediaPickerFragment extends BaseFragment implements
             if (mMediaSelectedList != null && mMediaSelectedList.size() > 0) {
                 mMediaType = mMediaSelectedList.get(0).getType();
             }
+
+            MAX =  getArguments()
+                    .getInt(KEY_MEDIA_SELECTED_MAX);
+            countBackgroundResID =  getArguments()
+                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColorResID =  getArguments()
+                    .getInt(KEY_COUNT_TEXT_COLOR);
+            borderColorResID =  getArguments()
+                    .getInt(KEY_SELECTED_BORDER_COLOR);
         }
         // get the photo size and spacing
         mPhotoSize = getResources().getDimensionPixelSize(
                 R.dimen.picker_photo_size);
         mPhotoSpacing = getResources().getDimensionPixelSize(
                 R.dimen.picker_photo_spacing);
+
+
     }
 
     @Override
@@ -217,7 +261,9 @@ public class MediaPickerFragment extends BaseFragment implements
             PickerImageView pickerImageView = (PickerImageView) view
                     .findViewById(R.id.thumbnail);
             MediaItem mediaItem = new MediaItem(mMediaType, uri);
-            mMediaAdapter.updateMediaSelected(mediaItem, pickerImageView);
+            Button button = (Button) view
+                    .findViewById(R.id.count);
+            mMediaAdapter.updateMediaSelected(mediaItem, pickerImageView, button);
             mMediaSelectedList = mMediaAdapter.getMediaSelectedList();
 
             if (mMediaAdapter.hasSelected()) {

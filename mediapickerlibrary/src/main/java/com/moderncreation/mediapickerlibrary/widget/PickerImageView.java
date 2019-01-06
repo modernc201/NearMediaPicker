@@ -17,6 +17,7 @@ public class PickerImageView extends android.support.v7.widget.AppCompatImageVie
 
     private boolean isSelected;
     private int borderSize = 1;
+    private int a, r, g, b;
 
     public PickerImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -31,7 +32,7 @@ public class PickerImageView extends android.support.v7.widget.AppCompatImageVie
     private void init() {
         paintBorder = new Paint();
         paintBorder.setAntiAlias(true);
-        paintBorder.setColor(getResources().getColor(R.color.picker_color));
+        paintBorder.setARGB(a,r,g,b);
         borderSize = getResources().getDimensionPixelSize(
                 R.dimen.picker_border_size);
     }
@@ -39,6 +40,18 @@ public class PickerImageView extends android.support.v7.widget.AppCompatImageVie
     public PickerImageView(Context context) {
         super(context);
         init();
+    }
+
+    public void setBorderColor(int a,int r,int g,int b){
+        this.a = a;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        paintBorder.setARGB(a,r,g,b);
+    }
+
+    public void setBorderColor(int borderColor){
+        paintBorder.setColor(getResources().getColor(borderColor));
     }
 
     public void setSelected(boolean isSelected) {

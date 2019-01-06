@@ -98,12 +98,12 @@ public class MediaPickerActivity extends AppCompatActivity implements
         Intent intent = new Intent(activity, MediaPickerActivity.class);
         intent.putExtra(EXTRA_MEDIA_OPTIONS, options);
 
-        intent.putExtra(KEY_SELECTED_BORDER_COLOR, borderColorResID);
-        intent.putExtra(KEY_COUNT_BACKGROUND_COLOR, countBackgroundResID);
-        intent.putExtra(KEY_COUNT_TEXT_COLOR, countTextColorResID);
+        intent.putExtra(KEY_SELECTED_BORDER_COLOR, activity.getResources().getColor(borderColorResID));
+        intent.putExtra(KEY_COUNT_BACKGROUND_COLOR, activity.getResources().getColor(countBackgroundResID));
+        intent.putExtra(KEY_COUNT_TEXT_COLOR, activity.getResources().getColor(countTextColorResID));
         intent.putExtra(KEY_MEDIA_SELECTED_MAX, max);
 
-        activity.startActivityForResult(intent, requestCode);;
+        activity.startActivityForResult(intent, requestCode);
 
     }
 

@@ -158,8 +158,25 @@ public class MediaPickerActivity extends AppCompatActivity implements
                     .getParcelable(EXTRA_MEDIA_OPTIONS);
             mPhotoFileCapture = (File) savedInstanceState
                     .getSerializable(KEY_PHOTOFILE_CAPTURE);
+
+            MAX = savedInstanceState
+                    .getInt(KEY_MEDIA_SELECTED_MAX);
+            countBackgroundResID = savedInstanceState
+                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColorResID = savedInstanceState
+                    .getInt(KEY_COUNT_TEXT_COLOR);
+            borderColorResID = savedInstanceState
+                    .getInt(KEY_SELECTED_BORDER_COLOR);
         } else {
             mMediaOptions = getIntent().getParcelableExtra(EXTRA_MEDIA_OPTIONS);
+            MAX =  getIntent()
+                    .getIntExtra(KEY_MEDIA_SELECTED_MAX, -1);
+            countBackgroundResID =  getIntent()
+                    .getIntExtra(KEY_COUNT_BACKGROUND_COLOR, -1);
+            countTextColorResID =  getIntent()
+                    .getIntExtra(KEY_COUNT_TEXT_COLOR, -1);
+            borderColorResID =  getIntent()
+                    .getIntExtra(KEY_SELECTED_BORDER_COLOR, -1);
             if (mMediaOptions == null) {
                 throw new IllegalArgumentException(
                         "MediaOptions must be not null, you should use MediaPickerActivity.open(Activity activity, int requestCode,MediaOptions options) method instead.");

@@ -25,6 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.moderncreation.mediapickerlibrary.ARGBColor;
 import com.moderncreation.mediapickerlibrary.MediaAdapter;
 import com.moderncreation.mediapickerlibrary.MediaItem;
 import com.moderncreation.mediapickerlibrary.MediaOptions;
@@ -76,20 +77,20 @@ public class MediaPickerFragment extends BaseFragment implements
 
     private int a = 255,r= 118,g =193,b=200;
     private int MAX = 5;
-    private int countBackgroundResID = -1;
-    private int countTextColorResID = -1;
-    private int borderColorResID = -1;
+    private ARGBColor countBackgroundColor ;
+    private ARGBColor countTextColor;
+    private ARGBColor borderColor ;
 
     public MediaPickerFragment() {
         mSavedInstanceState = new Bundle();
     }
 
-    public static MediaPickerFragment newInstance(MediaOptions options, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
+    public static MediaPickerFragment newInstance(MediaOptions options, ARGBColor borderColor, ARGBColor countBackgroundColor ,ARGBColor countTextColor, int max) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(MediaPickerActivity.EXTRA_MEDIA_OPTIONS, options);
-        bundle.putInt(KEY_COUNT_TEXT_COLOR, countTextColorResID);
-        bundle.putInt(KEY_COUNT_BACKGROUND_COLOR, countBackgroundResID);
-        bundle.putInt(KEY_SELECTED_BORDER_COLOR, borderColorResID);
+        bundle.putSerializable(KEY_COUNT_TEXT_COLOR, countTextColor);
+        bundle.putSerializable(KEY_COUNT_BACKGROUND_COLOR, countBackgroundColor);
+        bundle.putSerializable(KEY_SELECTED_BORDER_COLOR, borderColor);
         bundle.putInt(KEY_MEDIA_SELECTED_MAX, max);
 
         MediaPickerFragment fragment = new MediaPickerFragment();
@@ -117,12 +118,12 @@ public class MediaPickerFragment extends BaseFragment implements
 
             MAX = savedInstanceState
                     .getInt(KEY_MEDIA_SELECTED_MAX);
-            countBackgroundResID = savedInstanceState
-                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
-            countTextColorResID = savedInstanceState
-                    .getInt(KEY_COUNT_TEXT_COLOR);
-            borderColorResID = savedInstanceState
-                    .getInt(KEY_SELECTED_BORDER_COLOR);
+            countBackgroundColor = (ARGBColor) savedInstanceState
+                    .getSerializable(KEY_COUNT_BACKGROUND_COLOR);
+            countBackgroundColor =(ARGBColor)  savedInstanceState
+                    .getSerializable(KEY_COUNT_TEXT_COLOR);
+            borderColor = (ARGBColor) savedInstanceState
+                    .getSerializable(KEY_SELECTED_BORDER_COLOR);
         } else {
             mMediaOptions = getArguments().getParcelable(
                     MediaPickerActivity.EXTRA_MEDIA_OPTIONS);
@@ -140,12 +141,12 @@ public class MediaPickerFragment extends BaseFragment implements
 
             MAX =  getArguments()
                     .getInt(KEY_MEDIA_SELECTED_MAX);
-            countBackgroundResID =  getArguments()
-                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
-            countTextColorResID =  getArguments()
-                    .getInt(KEY_COUNT_TEXT_COLOR);
-            borderColorResID =  getArguments()
-                    .getInt(KEY_SELECTED_BORDER_COLOR);
+            countBackgroundColor = (ARGBColor) getArguments()
+                    .getSerializable(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColor = (ARGBColor) getArguments()
+                    .getSerializable(KEY_COUNT_TEXT_COLOR);
+            borderColor = (ARGBColor) getArguments()
+                    .getSerializable(KEY_SELECTED_BORDER_COLOR);
         }
         // get the photo size and spacing
         mPhotoSize = getResources().getDimensionPixelSize(
@@ -232,9 +233,9 @@ public class MediaPickerFragment extends BaseFragment implements
         if (mMediaSelectedList != null) {
             mMediaAdapter.setMediaSelectedList(mMediaSelectedList);
         }
-        mMediaAdapter.setCountTextColor(countTextColorResID);
-        mMediaAdapter.setSelectorBorderColor(borderColorResID);
-        mMediaAdapter.setCountBackgroundResID(countBackgroundResID);
+        mMediaAdapter.setCountBackgroundColor(countBackgroundColor);
+        mMediaAdapter.setSelectorBorderColor(borderColor);
+        mMediaAdapter.setCountTextColor(countTextColor);
         mMediaAdapter.setMAX(MAX);
         mMediaAdapter.notifyDataSetChanged();
     }

@@ -1,11 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MediaPickerTheme" parent="Theme.AppCompat">
+    <style name="MediaPickerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Support library compatibility -->
         <item name="windowActionBarOverlay">true</item>
         <item name="actionMenuTextColor">@color/picker_color</item>
         <item name="android:textSize">14sp</item>
         <item name="android:divider">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
     </style>
 
 </resources>

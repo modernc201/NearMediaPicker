@@ -3,6 +3,8 @@ package com.moderncreation.mediapickerlibrary;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.net.Uri;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.CursorAdapter;
@@ -28,6 +30,7 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
     private int mMediaType;
     private MediaImageLoader mMediaImageLoader;
     private List<MediaItem> mMediaListSelected = new ArrayList<MediaItem>();
+    private List<Button> countList;
     private MediaOptions mMediaOptions;
     private int mItemHeight = 0;
     private int mNumColumns = 0;
@@ -36,9 +39,9 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
     private int a = 255,r= 118,g =193,b=200;
     private int count = 0;
     private int MAX = 5;
-    private int countBackgroundResID = -1;
-    private int countTextColorResID = -1;
-    private int borderColorResID = -1;
+    private ARGBColor countBackgroundColor;
+    private ARGBColor countTextColor;
+    private ARGBColor borderColor;
 
 
 
@@ -59,6 +62,7 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
         mMediaOptions = mediaOptions;
         mImageViewLayoutParams = new RelativeLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        countList = new ArrayList<>();
     }
 
     @Override
@@ -89,17 +93,19 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
         holder.thumbnail = root.findViewById(R.id.overlay);
         holder.count = root.findViewById(R.id.count);
 
-        if(-1 != countBackgroundResID){
+        if(null != countBackgroundColor){
+            int color = Color.argb(countBackgroundColor.getA(), countBackgroundColor.getR(),countBackgroundColor.getG(),countBackgroundColor.getB());
             ViewCompat.setBackgroundTintList(
                     holder.count,
-                    ColorStateList.valueOf(countBackgroundResID));
+                    ColorStateList.valueOf(color));
         }
-        if(-1 != countTextColorResID){
-            holder.count.setTextColor(countTextColorResID);
+        if(null != countTextColor){
+            int color = Color.argb(countTextColor.getA(), countTextColor.getR(),countTextColor.getG(),countTextColor.getB());
+            holder.count.setTextColor(color);
         }
 
-        if(-1 != countTextColorResID){
-            holder.imageView.setBorderColor(borderColorResID);
+        if(null != borderColor){
+            holder.imageView.setBorderColor(countBackgroundColor.getA(),borderColor.getR(),borderColor.getG(),borderColor.getB());
         }
 
         //holder.imageView.setBorderColor(a,r,g,b);
@@ -168,14 +174,16 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
      */
     public void updateMediaSelected(MediaItem item,
                                     PickerImageView pickerImageView, Button buttonCount) {
+        int index = 0;
         if (mMediaListSelected.contains(item)) {
             mMediaListSelected.remove(item);
             pickerImageView.setSelected(false);
             this.mPickerImageViewSelected.remove(pickerImageView);
+            countList.remove(buttonCount);
             buttonCount.setVisibility(View.GONE);
-            --count;
+
         } else {
-            if(count >= MAX){
+            if(mPickerImageViewSelected.size() >= MAX){
                 Toast.makeText(mContext, "최대 "+ MAX +"개 선택이 가능 합니다.", Toast.LENGTH_SHORT).show();
             }else{
                 boolean value = syncMediaSelectedAsOptions();
@@ -186,13 +194,15 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
                     this.mPickerImageViewSelected.clear();
                 }
                 mMediaListSelected.add(item);
+                countList.add(buttonCount);
                 pickerImageView.setSelected(true);
                 this.mPickerImageViewSelected.add(pickerImageView);
-
-                ++count;
                 buttonCount.setVisibility(View.VISIBLE);
-                buttonCount.setText(count +"");
             }
+        }
+
+        for(Button b: countList){
+            b.setText(++index+"");
         }
 
     }
@@ -279,24 +289,17 @@ public class MediaAdapter extends CursorAdapter implements RecyclerListener {
         mPickerImageViewSelected.clear();
     }
 
-    public void setSelectorBorderColor(int a,int r, int g, int b){
-        this.a = a;
-        this.r = r;
-        this.g = g;
-        this.b = b;
+    public void setSelectorBorderColor(ARGBColor borderColor){
+        this.borderColor = borderColor;
     }
 
-    public void setSelectorBorderColor(int borderColorResID){
-        this.borderColorResID = borderColorResID;
-    }
-
-    public void setCountBackgroundResID(int countBackgroundResID){
-        this.countBackgroundResID = countBackgroundResID;
+    public void setCountBackgroundColor(ARGBColor countBackgroundColor){
+        this.countBackgroundColor = countBackgroundColor;
     }
 
 
-    public void setCountTextColor(int countTextColorResID){
-        this.countTextColorResID = countTextColorResID;
+    public void setCountTextColor(ARGBColor countTextColor){
+        this.countTextColor = countTextColor;
     }
 
     public void setMAX(int max){

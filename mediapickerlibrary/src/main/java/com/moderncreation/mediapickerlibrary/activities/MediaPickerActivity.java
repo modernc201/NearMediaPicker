@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
@@ -25,7 +28,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
+import com.moderncreation.mediapickerlibrary.ARGBColor;
 import com.moderncreation.mediapickerlibrary.CropListener;
 import com.moderncreation.mediapickerlibrary.MediaItem;
 import com.moderncreation.mediapickerlibrary.MediaOptions;
@@ -82,9 +89,9 @@ public class MediaPickerActivity extends AppCompatActivity implements
     private boolean takeVideoPending;
 
     private int MAX = 5;
-    private int countBackgroundResID = -1;
-    private int countTextColorResID = -1;
-    private int borderColorResID = -1;
+    private ARGBColor countBackgroundColor;
+    private ARGBColor countTextColor;
+    private ARGBColor borderColor ;
 
     /**
      * Start {@link MediaPickerActivity} in {@link Activity} to pick photo or
@@ -95,13 +102,13 @@ public class MediaPickerActivity extends AppCompatActivity implements
      * @param options
      */
     public static void open(Activity activity, int requestCode,
-                            MediaOptions options, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
+                            MediaOptions options, ARGBColor borderColor, ARGBColor countBackgroundColor , ARGBColor countTextColor, int max) {
         Intent intent = new Intent(activity, MediaPickerActivity.class);
         intent.putExtra(EXTRA_MEDIA_OPTIONS, options);
 
-        intent.putExtra(KEY_SELECTED_BORDER_COLOR, activity.getResources().getColor(borderColorResID));
-        intent.putExtra(KEY_COUNT_BACKGROUND_COLOR, activity.getResources().getColor(countBackgroundResID));
-        intent.putExtra(KEY_COUNT_TEXT_COLOR, activity.getResources().getColor(countTextColorResID));
+        intent.putExtra(KEY_SELECTED_BORDER_COLOR, borderColor);
+        intent.putExtra(KEY_COUNT_BACKGROUND_COLOR, countBackgroundColor);
+        intent.putExtra(KEY_COUNT_TEXT_COLOR, countTextColor);
         intent.putExtra(KEY_MEDIA_SELECTED_MAX, max);
 
         activity.startActivityForResult(intent, requestCode);
@@ -116,8 +123,8 @@ public class MediaPickerActivity extends AppCompatActivity implements
      * @param activity
      * @param requestCode
      */
-    public static void open(Activity activity, int requestCode, int borderColorResID, int countBackgroundResID ,int countTextColorResID, int max) {
-        open(activity, requestCode, MediaOptions.createDefault(), borderColorResID, countBackgroundResID, countTextColorResID,max);
+    public static void open(Activity activity, int requestCode, ARGBColor borderColor, ARGBColor countBackgroundColor ,ARGBColor countTextColor, int max) {
+        open(activity, requestCode, MediaOptions.createDefault(), borderColor, countBackgroundColor, countTextColor,max);
     }
 
     /**
@@ -163,22 +170,22 @@ public class MediaPickerActivity extends AppCompatActivity implements
 
             MAX = savedInstanceState
                     .getInt(KEY_MEDIA_SELECTED_MAX);
-            countBackgroundResID = savedInstanceState
-                    .getInt(KEY_COUNT_BACKGROUND_COLOR);
-            countTextColorResID = savedInstanceState
-                    .getInt(KEY_COUNT_TEXT_COLOR);
-            borderColorResID = savedInstanceState
-                    .getInt(KEY_SELECTED_BORDER_COLOR);
+            countBackgroundColor = (ARGBColor) savedInstanceState
+                    .getSerializable(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColor = (ARGBColor) savedInstanceState
+                    .getSerializable(KEY_COUNT_TEXT_COLOR);
+            borderColor = (ARGBColor) savedInstanceState
+                    .getSerializable(KEY_SELECTED_BORDER_COLOR);
         } else {
             mMediaOptions = getIntent().getParcelableExtra(EXTRA_MEDIA_OPTIONS);
             MAX =  getIntent()
-                    .getIntExtra(KEY_MEDIA_SELECTED_MAX, -1);
-            countBackgroundResID =  getIntent()
-                    .getIntExtra(KEY_COUNT_BACKGROUND_COLOR, -1);
-            countTextColorResID =  getIntent()
-                    .getIntExtra(KEY_COUNT_TEXT_COLOR, -1);
-            borderColorResID =  getIntent()
-                    .getIntExtra(KEY_SELECTED_BORDER_COLOR, -1);
+                    .getIntExtra(KEY_MEDIA_SELECTED_MAX, 5);
+            countBackgroundColor = (ARGBColor)  getIntent()
+                    .getSerializableExtra(KEY_COUNT_BACKGROUND_COLOR);
+            countTextColor = (ARGBColor)  getIntent()
+                    .getSerializableExtra(KEY_COUNT_TEXT_COLOR);
+            borderColor = (ARGBColor)  getIntent()
+                    .getSerializableExtra(KEY_SELECTED_BORDER_COLOR);
             if (mMediaOptions == null) {
                 throw new IllegalArgumentException(
                         "MediaOptions must be not null, you should use MediaPickerActivity.open(Activity activity, int requestCode,MediaOptions options) method instead.");
@@ -188,15 +195,26 @@ public class MediaPickerActivity extends AppCompatActivity implements
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container,
-                            MediaPickerFragment.newInstance(mMediaOptions, borderColorResID, countBackgroundResID, countTextColorResID, MAX))
+                            MediaPickerFragment.newInstance(mMediaOptions, borderColor, countBackgroundColor, countTextColor, MAX))
                     .commit();
         }
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.picker_actionbar_translucent));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(borderColor.getA(),borderColor.getR(),borderColor.getG(),borderColor.getB())));
+            //getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.picker_actionbar_translucent));
             getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
     }
 
     @Override
